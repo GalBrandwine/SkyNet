@@ -1,0 +1,285 @@
+html { 
+    font-family: 'Open Sans', sans-serif; 
+    display: block; 
+    margin: 0px auto; 
+    text-align: center;
+    color: #333333;
+  }
+  body {
+    margin-top: 50px;
+  }
+  h1 {
+    margin: 50px auto 30px;
+  }
+  .side-by-side {
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+  }
+  /* .humidity-icon {
+    background-color: #3498db;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    line-height: 36px;
+  }
+  .humidity-text {
+    font-weight: 600;
+    padding-left: 15px;
+    font-size: 19px;
+    width: 160px;
+    text-align: left;
+  }
+  .humidity {
+    font-weight: 300;
+    font-size: 60px;
+    color: #3498db;
+  }
+  .temperature-icon {
+    background-color: #f39c12;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    line-height: 40px;
+  }
+  .temperature-text {
+    font-weight: 600;
+    padding-left: 15px;
+    font-size: 19px;
+    width: 160px;
+    text-align: left;
+  }
+  .temperature {
+    font-weight: 300;
+    font-size: 60px;
+    color: #f39c12;
+  }
+  .gas-icon {
+    background-color: #ff0000;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    line-height: 36px;
+  }
+  .gas-text {
+    font-weight: 600;
+    padding-left: 15px;
+    font-size: 19px;
+    width: 160px;
+    text-align: left;
+  }
+  .gas {
+    font-weight: 300;
+    font-size: 60px;
+    color: #ff0000;
+  } */
+  .superscript {
+    font-size: 17px;
+    font-weight: 600;
+    position: absolute;
+    right: -35px;
+    top: 15px;
+  }
+  .data {
+    padding: 10px;
+  }
+  
+  .bluelight {
+    font-weight: 40;
+    font-size: 30px;
+    color: #a31aff;
+  }
+  
+  .ledseting_text {
+    font-weight: 40;
+    font-size: 30px;
+    color: #a31a0b;
+  }
+  
+  .slidecontainer {
+    width: 100%;
+  }
+  
+  .slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 25px;
+    background: #d3d390;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+  }
+  
+  .slider:hover {
+    opacity: 1;
+  }
+  
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    background: #4CAF65;
+    cursor: pointer;
+  }
+  
+  .slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    background: #4CAF65;
+    cursor: pointer;
+  }
+  
+  .note {
+    background-color: lightgrey;
+    width: device-width;
+    border-radius: 25px;
+    border: 2px solid #73AD21;
+    vertical-align: middle;
+    position: relative;
+    display: inline-block;
+    padding: 20px;
+  
+  }
+  .ledSetting{
+    background-color: lightgrey;
+    border-radius: 25px;
+    border: 2px solid #73AD21;
+    vertical-align: middle;
+    position: relative;
+    display: inline-block;
+    padding: 20px;
+  }
+  .ledSettingday{
+   background-color: lightskyblue;
+   width: 350px;
+  }
+  
+  .ledSettingnight{
+   background-color: lightsteelblue;
+   width: 350px;
+  }
+  .wifi_cardentials{
+    background-color: lightgrey;
+    width: device-width;
+    border-radius: 25px;
+    border: 2px solid #73AD21;
+    vertical-align: middle;
+    position: relative;
+    display: inline-block;
+    padding: 20px;
+  }
+  
+  
+  p{
+    padding: 16px 40px;
+    text-align: left;
+    font-size: 10px;
+  }
+  P.a {
+    word-break: normal;
+  }
+  .button {
+    display: inline-block;
+    background-color: #008CBA;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    padding: 16px 20px;
+    text-decoration: none;
+    font-size: 15px;
+    margin: 2px;
+    cursor: pointer;
+  }
+  .button2 {
+    background-color: #f44336;
+  }
+  .button3 {
+    background-color: #cc00ff;
+  }
+  
+  form {
+    display: inline-block;
+    margin-top: 0em;
+  }
+  
+  
+  
+  
+  
+  
+  .green {
+    background-color: #0a9f36;
+    border-radius: 25px;
+    border: 2px solid #7fADaf;
+  }
+  .red {
+    background-color: #f44336;
+    border-radius: 25px;
+    border: 2px solid #7fADaf;
+  }
+  /* Customize the label (the container) */
+  /* The container */
+  .container {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Hide the browser's default radio button */
+  .container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+  }
+  
+  /* Create a custom radio button */
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #eee;
+    border-radius: 50%;
+  }
+  
+  /* On mouse-over, add a grey background color */
+  .container:hover input ~ .checkmark {
+    background-color: #ccc;
+  }
+  
+  /* When the radio button is checked, add a blue background */
+  .container input:checked ~ .checkmark {
+    background-color: #2196F3;
+  }
+  
+  /* Create the indicator (the dot/circle - hidden when not checked) */
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  
+  /* Show the indicator (dot/circle) when checked */
+  .container input:checked ~ .checkmark:after {
+    display: block;
+  }
+  
+  /* Style the indicator (dot/circle) */
+  .container .checkmark:after {
+       top: 9px;
+      left: 9px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: white;
+  }

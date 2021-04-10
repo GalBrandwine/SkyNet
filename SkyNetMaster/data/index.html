@@ -1,0 +1,306 @@
+<!DOCTYPE HTML>
+<html>
+<!-- Gal Brandwine -->
+
+<head>
+    <title>SkyNet</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" type="text/css" href="style.css"> <!-- Tells the html that we are using css. -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet">
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+</head>
+
+
+<body>
+    <img src="cloud_1.jpg" alt="This is Cloud master image">
+    <h1>Welcome to SkyNet</h1>
+    <h2>This is MasterCloud</h2>
+
+
+    <div class="side-by-side">
+        <div class="note">
+            <a> Current system time:</a>
+            <a id="currentSystemTime"> 0000</a>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="note">
+        <div class="data">
+            <a> Time left until watering: </a><a id="getTimeLeft"></a><a> Minutes.</a>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="side-by-side">
+        <div class="note">
+            <div class="data">
+                <h2>FREQUENCY</h2>
+                <label class="container red">Reset
+                    <input type="radio" name="frequency" value="0" onclick="ValidateFrequency(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">1 Hour
+                    <input type="radio" name="frequency" value="1" onclick="ValidateFrequency(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">2
+                    <input type="radio" name="frequency" value="2" onclick="ValidateFrequency(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">3
+                    <input type="radio" name="frequency" value="3" onclick="ValidateFrequency(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">4
+                    <input type="radio" name="frequency" value="4" onclick="ValidateFrequency(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">6
+                    <input type="radio" name="frequency" value="6" onclick="ValidateFrequency(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">8
+                    <input type="radio" name="frequency" value="8" onclick="ValidateFrequency(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">12
+                    <input type="radio" name="frequency" value="12" onclick="ValidateFrequency(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">24
+                    <input type="radio" name="frequency" value="24" onclick="ValidateFrequency(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">48
+                    <input type="radio" name="frequency" value="48" onclick="ValidateFrequency(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">72
+                    <input type="radio" name="frequency" value="72" onclick="ValidateFrequency(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">Week
+                    <input type="radio" name="frequency" value="168" onclick="ValidateFrequency(this);">
+                    <span class="checkmark"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="note">
+            <div class="data">
+                <h2>RUN TIME</h2>
+                <label class="container red">OFF
+                    <input type="radio" name="runtime" value="off" onclick="ValidateRunTime(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">1 min
+                    <input type="radio" name="runtime" value="1" onclick="ValidateRunTime(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">3
+                    <input type="radio" name="runtime" value="3" onclick="ValidateRunTime(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">5
+                    <input type="radio" name="runtime" value="5" onclick="ValidateRunTime(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">10
+                    <input type="radio" name="runtime" value="10" onclick="ValidateRunTime(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">15
+                    <input type="radio" name="runtime" value="15" onclick="ValidateRunTime(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">20
+                    <input type="radio" name="runtime" value="20" onclick="ValidateRunTime(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">30
+                    <input type="radio" name="runtime" value="30" onclick="ValidateRunTime(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">60
+                    <input type="radio" name="runtime" value="60" onclick="ValidateRunTime(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">90
+                    <input type="radio" name="runtime" value="90" onclick="ValidateRunTime(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container">120
+                    <input type="radio" name="runtime" value="120" onclick="ValidateRunTime(this);">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="container green">ON
+                    <input type="radio" name="runtime" value="on" onclick="ValidateRunTime(this);">
+                    <span class="checkmark"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+</body>
+
+
+<script>
+    
+    window.onload = function () {
+        // getFrequency();
+        // getRunTime();
+        // isSystemWatering();
+        // getTimeLeft();
+    };
+
+    // function getFrequency() {
+    //     var xhttp = new XMLHttpRequest();
+    //     xhttp.onreadystatechange = function () {
+    //         if (this.readyState == 4 && this.status == 200) {
+    //             checkboxes = document.getElementsByName('frequency');
+    //             for (var i = 0, length = checkboxes.length; i < length; i++) {
+    //                 if (checkboxes[i].value == this.responseText) {
+    //                     checkboxes[i].checked = true;
+    //                     break;
+    //                 }
+    //             }
+    //         }
+    //     };
+    //     xhttp.open("GET", "/getFrequency", true);
+    //     xhttp.send();
+    // }
+
+    // setInterval(getFrequency, 1000);
+
+
+    // function getRunTime() {
+    //     var xhttp = new XMLHttpRequest();
+    //     xhttp.onreadystatechange = function () {
+    //         if (this.readyState == 4 && this.status == 200) {
+    //             checkboxes = document.getElementsByName('runtime');
+    //             for (var i = 0, length = checkboxes.length; i < length; i++) {
+    //                 if (checkboxes[i].value == this.responseText) {
+    //                     // do whatever you want with the checked radio
+    //                     checkboxes[i].checked = true;
+    //                     //alert(checkboxes[i].value);
+    //                     // only one radio can be logically checked, don't check the rest
+    //                     break;
+    //                 }
+    //             }
+    //         }
+    //     };
+    //     xhttp.open("GET", "/getRunTime", true);
+    //     xhttp.send();
+    // }
+
+    // setInterval(getRunTime, 1000);
+
+
+    function ValidateRunTime(cb) {
+        if (confirm("You have selected " + cb.value + " minutes of runtime. Is that correct?")) // Raise as popup
+        {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    if (this.responseText == 255)
+                        alert("Server confirm: " + "off");
+                    if (this.responseText == 254)
+                        alert("Server confirm: " + "on");
+                    else
+                        alert("Server confirm: " + this.responseText);
+                }
+            };
+            xhttp.open("GET", "/runtime" + "?runtime=" + cb.value, true);
+            xhttp.send();
+
+            return true;
+        }
+        else {
+            cb.checked = false
+            return false;
+        }
+    }
+
+    function ValidateFrequency(cb) {
+        if (confirm("You have selected " + cb.value + " frequency. Is that correct?")) // Raise as popup
+        {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    if (this.responseText == 0)
+                        alert("Server confirm: " + "reset");
+                    else
+                        alert("Server confirm: " + this.responseText);
+                }
+            };
+
+            xhttp.open("GET", "/frequency" + "?frequency=" + cb.value, true);
+            xhttp.send();
+
+            return true;
+        }
+        else {
+            cb.checked = false
+            return false;
+        }
+    }
+
+    // function isSystemWatering() {
+    //     var xhttp = new XMLHttpRequest();
+    //     xhttp.onreadystatechange = function () {
+    //         if (this.readyState == 4 && this.status == 200) {
+    //             if (this.responseText == 0) {
+    //                 document.getElementById("isSystemWatering").innerHTML = "not watering";
+    //                 document.getElementById('isSystemWatering').style.color = "red";
+    //             }
+    //             else {
+    //                 document.getElementById("isSystemWatering").innerHTML = "watering";
+    //                 document.getElementById('isSystemWatering').style.color = "blue";
+    //             }
+    //         }
+    //     };
+    //     xhttp.open("GET", "/isSystemWatering", true);
+    //     xhttp.send();
+    // }
+
+    // // Update the clients side - if system is watering right now. once a second
+    // setInterval(isSystemWatering, 1000);
+
+
+    // function getTimeLeft() {
+    //     var xhttp = new XMLHttpRequest();
+    //     xhttp.onreadystatechange = function () {
+    //         if (this.readyState == 4 && this.status == 200) {
+    //             document.getElementById("getTimeLeft").innerHTML = this.responseText;
+    //         }
+    //     };
+    //     xhttp.open("GET", "/getTimeLeft", true);
+    //     xhttp.send();
+    // }
+
+    // setInterval(getTimeLeft, 30000); //Every 30 secs.
+
+    // Update systems time on client html
+    function getCurrentSystemTime() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            document.getElementById("currentSystemTime").innerHTML = this.responseText;
+        };
+
+        xhttp.open("GET", "/getCurrentSystemTime", true);
+        xhttp.send();
+    }
+
+    setInterval(getCurrentSystemTime, 1000); //Every 1 secs.
+
+
+
+
+
+
+</script>
+
+</html>
