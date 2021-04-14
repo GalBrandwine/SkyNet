@@ -3,7 +3,6 @@
 // Setting today's time and date.
 #include <Wire.h>
 #include <ds3231.h>
-static struct ts rtc_timestamp;
 
 /**
  * @brief Convert timestamp to string.
@@ -19,5 +18,11 @@ void time_to_string(const ts &t, String &time_string)
   time_string += (int)t.min;
   time_string += ":";
   time_string += (int)t.sec;
+  time_string += "_";
+  time_string += (int)t.mday;
+  time_string += "/";
+  time_string += (int)t.mon;
+  time_string += "/";
+  time_string += (int)t.year;
 }
 #endif HEADERFILE_H

@@ -1,30 +1,3 @@
-/*
- WiFi Web Server LED Blink
-
- A simple web server that lets you blink an LED via the web.
- This sketch will print the IP address of your WiFi Shield (once connected)
- to the Serial monitor. From there, you can open that address in a web browser
- to turn on and off the LED on pin 5.
-
- If the IP address of your shield is yourAddress:
- http://yourAddress/H turns the LED on
- http://yourAddress/L turns it off
-
- This example is written for a network using WPA encryption. For
- WEP or WPA, change the Wifi.begin() call accordingly.
-
- Circuit:
- * WiFi shield attached
- * LED attached to pin 5
-
- created for arduino 25 Nov 2012
- by Tom Igoe
-
-ported for sparkfun esp32 
-31.01.2017 by Jan Hendrik Berlin
-
- */
-
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <WiFiAP.h>
@@ -56,8 +29,12 @@ ported for sparkfun esp32
 #include "/home/gal/dev/SkyNet/include/setUpServer.h"
 #include "/home/gal/dev/SkyNet/include/RTCsettings.h"
 #include "/home/gal/dev/SkyNet/include/LEDsettings.h"
+#include "/home/gal/dev/SkyNet/include/Weathersettings.h"
 
+int lighting_counter = 0;
+int lightning_modulo_base = random(5, 10);
 SkyNetStruct skyNet;
+
 AsyncWebServer server(80);
 
 void initAccessPoint()
@@ -103,11 +80,13 @@ void setup()
   pinMode(BUILTIN_LED, OUTPUT); // set the LED pin mode
 
   /**
-   * @brief Choose between Wifi or AP
-   * 
+   * @brief CloudMaster should create an AP.
    */
   initAccessPoint();
-  // initExistingWifiConnection();
+  /**
+   * @brief Cloud slave should connect to existing SkyNetWifi.
+   * initExistingWifiConnection();
+   */
 
   skyNet.server = &server;
 
@@ -115,6 +94,9 @@ void setup()
     digitalWrite(LED_BUILTIN, HIGH);
   else
     digitalWrite(LED_BUILTIN, LOW);
+
+  delay(500);
+  digitalWrite(LED_BUILTIN, LOW);
 
   Wire.begin();
   DS3231_init(DS3231_CONTROL_INTCN);
@@ -167,71 +149,36 @@ void loop()
 {
   ArduinoOTA.handle();
 
-  DS3231_get(&rtc_timestamp);
-  time_to_string(rtc_timestamp, skyNet.time_str);
-  Serial.println(skyNet.time_str);
+  /**
+   * @brief If I'm CloudMaster
+   * 
+   */
+  DS3231_get(&skyNet.rtc_timestamp);
+  time_to_string(skyNet.rtc_timestamp, skyNet.time_str);
+  Serial.print("\n");
+  Serial.print(skyNet.time_str);
+  Serial.print("\n");
   delay(1000);
 
-  showProgramTimeOfDay(rtc_timestamp);
-  // showProgramRandom(10, 1000);
+  /**
+   * @brief All clouds have this
+   * 
+   */
+  showProgramTimeOfDay(skyNet);
 
-  // WiFiClient client = server.available(); // listen for incoming clients
+  skyNet.current_weather = Weather::get_next_weather(skyNet.rtc_timestamp);
+  Serial.print("Skynet current weather: ");
+  Serial.println(Weather::to_string(skyNet.current_weather));
 
-  // if (client)
-  // {                                // if you get a client,
-  //   Serial.println("New Client."); // print a message out the serial port
-  //   String currentLine = "";       // make a String to hold incoming data from the client
-  //   while (client.connected())
-  //   { // loop while the client's connected
-  //     if (client.available())
-  //     {                         // if there's bytes to read from the client,
-  //       char c = client.read(); // read a byte, then
-  //       Serial.write(c);        // print it out the serial monitor
-  //       if (c == '\n')
-  //       { // if the byte is a newline character
-
-  //         // if the current line is blank, you got two newline characters in a row.
-  //         // that's the end of the client HTTP request, so send a response:
-  //         if (currentLine.length() == 0)
-  //         {
-  //           // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
-  //           // and a content-type so the client knows what's coming, then a blank line:
-  //           client.println("HTTP/1.1 200 OK");
-  //           client.println("Content-type:text/html");
-  //           client.println();
-
-  //           // the content of the HTTP response follows the header:
-  //           client.print("Click <a href=\"/H\">here</a> to turn the LED on pin 5 on.<br>");
-  //           client.print("Click <a href=\"/L\">here</a> to turn the LED on pin 5 off.<br>");
-
-  //           // The HTTP response ends with another blank line:
-  //           client.println();
-  //           // break out of the while loop:
-  //           break;
-  //         }
-  //         else
-  //         { // if you got a newline, then clear currentLine:
-  //           currentLine = "";
-  //         }
-  //       }
-  //       else if (c != '\r')
-  //       {                   // if you got anything else but a carriage return character,
-  //         currentLine += c; // add it to the end of the currentLine
-  //       }
-
-  //       // Check to see if the client request was "GET /H" or "GET /L":
-  //       if (currentLine.endsWith("GET /H"))
-  //       {
-  //         digitalWrite(5, HIGH); // GET /H turns the LED on
-  //       }
-  //       if (currentLine.endsWith("GET /L"))
-  //       {
-  //         digitalWrite(5, LOW); // GET /L turns the LED off
-  //       }
-  //     }
-  //   }
-  //   // close the connection:
-  //   client.stop();
-  //   Serial.println("Client Disconnected.");
-  // }
+  switch (skyNet.current_weather)
+  {
+  case Weather::WeatherType::Stormy:
+    lighting_counter++;
+    if ((lighting_counter % lightning_modulo_base) == 0)
+    {
+      Serial.println("******* Doing lightning ******");
+      doLightning(random(5) + 1, random(50, 500) + 1);
+    }
+    break;
+  }
 }

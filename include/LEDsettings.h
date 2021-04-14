@@ -6,29 +6,37 @@
 #define BRIGHTNESS 96
 #define MIN_BRIGHTNESS 50
 #define MAX_BRIGHTNESS 255
+#define SUNSET_TIME_HOUR 19
+#define SUNRISE_TIME_HOUR 6
+
+#define WINTER_START 10
+#define WINTER_END 4
+
+#define SUMMER_START 5
+#define SUMMER_END 9
 
 CRGB leds[NUM_LEDS];
 
+const int weather_to_sat(const SkyNetStruct &skyNetStruct);
 /**
  * @brief Convert time of day to HSV values
- * 
- * Based on Classification Other application, of the HSV color space can be the day/night classification depending on the average Value, (amount of light).
- *  @code 
- *  sum_brightness = np.sum(hsv[:,:,2])
- *  area           = 600*1100.0 # pixels
- *  avg            = sum_brightness/area
- *  @endcode
- *  If the average is greater than 120 for example, is a day image, otherwise, a night image.
  * 
  * @param timeOfDay 
  * @return const CHSV 
  */
-const CHSV timeOfDayToHSV(const ts timeOfDay)
+const CHSV timeOfDayToHSV(const SkyNetStruct &skyNetStruct)
 {
-    auto hours = timeOfDay.hour;
+    auto hours = skyNetStruct.rtc_timestamp.hour;
     auto hourAngle = map(hours, 1, 24, 0, 360);
-    auto hue = map8(hourAngle, HUE_RED, HUE_PINK);
-    auto value = map8(hourAngle, MIN_BRIGHTNESS, MAX_BRIGHTNESS);
+    auto hue = map8(hourAngle, HUE_RED, HUE_PINK + 60);
+
+    auto sat = weather_to_sat(skyNetStruct);
+    // This is brightness. We want brightness to rise until noon.
+    uint8_t value;
+    if (hours < SUNSET_TIME_HOUR)
+        value = map8(hourAngle, MIN_BRIGHTNESS, MAX_BRIGHTNESS);
+    else
+        value = map(hours, 1, 24, MAX_BRIGHTNESS, MIN_BRIGHTNESS);
 
     Serial.print("\ntimeOfDayToHSV\n");
     Serial.print("For hour: ");
@@ -37,22 +45,87 @@ const CHSV timeOfDayToHSV(const ts timeOfDay)
     Serial.println(hourAngle);
     Serial.print("Got hue: ");
     Serial.println(hue);
+    Serial.print("sat: ");
+    Serial.println(sat);
     Serial.print("And value: ");
     Serial.println(value);
-    return CHSV(hue, 255, value);
+
+    return CHSV(hue, sat, value);
 }
 
-void showProgramTimeOfDay(const ts timeOfDay)
+const int weather_to_sat(const SkyNetStruct &skyNetStruct)
 {
-    auto newHsv = timeOfDayToHSV(timeOfDay);
+    switch (skyNetStruct.current_weather)
+    {
+    case Weather::WeatherType::Cloudy:
+        return 155;
+    case Weather::WeatherType::Drizzle:
+        return 160;
+    case Weather::WeatherType::Overcast:
+        return 185;
+    case Weather::WeatherType::PartiallyCloudy:
+        return 225;
+    case Weather::WeatherType::Rain:
+        return 200;
+    case Weather::WeatherType::Snow:
+        return 100;
+    case Weather::WeatherType::Stormy:
+        return 155;
+    case Weather::WeatherType::Sunny:
+        return 255;
+    }
+}
 
+/**
+ * @brief Set LED's color values according to time of day
+ * 
+ * @param timeOfDay timestamp with current time of day
+ */
+void showProgramTimeOfDay(const SkyNetStruct &skyNetStruct)
+{
+    auto newHsv = timeOfDayToHSV(skyNetStruct);
+    // auto seasonRGB = weather_to_rbg(skyNetStruct);
     for (int i = 0; i < NUM_LEDS; ++i)
     {
-        // leds[i] = CHSV(random8(), 255, 255); // hue, saturation, value
         leds[i].setHSV(newHsv.h, newHsv.s, newHsv.v);
-        ;
     }
     FastLED.show();
+}
+
+/**
+ * @brief Perform lightning effects
+ * 
+ * @param numIterations number of lightnings
+ * @param delayTime delay between lighting
+ */
+void doLightning(int numIterations, long delayTime)
+{
+    // Save current color
+    auto current_color = leds[0];
+
+    for (int iteration = 0; iteration < numIterations; ++iteration)
+    {
+        for (int i = 0; i < NUM_LEDS; ++i)
+        {
+            leds[i] = CRGB::White;
+        }
+        FastLED.show();
+
+        for (int i = 0; i < NUM_LEDS; ++i)
+        {
+            leds[i] = CRGB::Black;
+        }
+        FastLED.show();
+
+        // Delay between lightnings
+        delay(delayTime);
+    }
+
+    // Done with lighting, restoring old settings
+    for (int i = 0; i < NUM_LEDS; ++i)
+    {
+        leds[i] = current_color;
+    }
 }
 
 /**

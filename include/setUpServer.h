@@ -22,10 +22,68 @@ bool setUpServer(SkyNetStruct *skyNetStruct)
 
   // Responce for getting current system time.
   skyNetStruct->server->on("/getCurrentSystemTime", HTTP_GET, [skyNetStruct](AsyncWebServerRequest *request) {
-    // request->send(SPIFFS, "/cloud_1.jpg", String());
     request->send_P(200, "text/plain", skyNetStruct->time_str.c_str());
     Serial.println("Got HTTP_GET on '/getCurrentSystemTime'");
   });
+
+  /**
+   * @brief Responce for setting current system time.
+   * Time setting could come with 2 different parameters ans values:
+   * Hour:int
+   * Minute:int
+   */
+  skyNetStruct->server->on("/setCurrentSystemTime", HTTP_GET, [skyNetStruct](AsyncWebServerRequest *request) {
+    // request->send_P(200, "text/plain", skyNetStruct->time_str.c_str());
+    AsyncWebParameter *p = request->getParam(0);
+    Serial.println("Got HTTP_GET on '/setCurrentSystemTime'");
+    if (p->name() == "hour")
+    {
+      Serial.print("Received new hour setting: ");
+      Serial.println(p->value());
+      skyNetStruct->rtc_timestamp.hour = p->value().toInt();
+      DS3231_set(skyNetStruct->rtc_timestamp);
+    }
+    if (p->name() == "minute")
+    {
+      Serial.print("Received new minute setting: ");
+      Serial.println(p->value());
+      skyNetStruct->rtc_timestamp.min = p->value().toInt();
+      DS3231_set(skyNetStruct->rtc_timestamp);
+    }
+    if (p->name() == "day")
+    {
+      Serial.print("Received new day setting: ");
+      Serial.println(p->value());
+      skyNetStruct->rtc_timestamp.mday = p->value().toInt();
+      DS3231_set(skyNetStruct->rtc_timestamp);
+    }
+    if (p->name() == "month")
+    {
+      Serial.print("Received new month setting: ");
+      Serial.println(p->value());
+      skyNetStruct->rtc_timestamp.mon = p->value().toInt();
+      DS3231_set(skyNetStruct->rtc_timestamp);
+    }
+  });
+
+  /**
+   * @brief Set new weather request from users html.
+   * 
+   */
+  skyNetStruct->server->on("/setCurrentSystemSystemWeather", HTTP_GET, [skyNetStruct](AsyncWebServerRequest *request) {
+    AsyncWebParameter *p = request->getParam(0);
+    Serial.println("Got HTTP_GET on '/setCurrentSystemSystemWeather'");
+    Serial.println(p->name());
+    Serial.println(p->value());
+    skyNetStruct->current_weather = Weather::to_weather(p->value());
+  });
+
+  // Responce for getting current Weather.
+  skyNetStruct->server->on("/getCurrentSystemWeather", HTTP_GET, [skyNetStruct](AsyncWebServerRequest *request) {
+    request->send_P(200, "text/plain", Weather::to_string(skyNetStruct->current_weather).c_str());
+    Serial.println("Got HTTP_GET on '/getCurrentSystemWeather'");
+  });
+
   /**
    * @brief This is how the client pass information back to the server.
    * 
