@@ -1,5 +1,7 @@
+#include <Preferences.h>
 #include "ESPAsyncWebServer.h"
 #include "SPIFFS.h"
+
 bool setUpServer(SkyNetStruct *skyNetStruct)
 {
   // Route for root / web page
@@ -84,66 +86,49 @@ bool setUpServer(SkyNetStruct *skyNetStruct)
     Serial.println("Got HTTP_GET on '/getCurrentSystemWeather'");
   });
 
-  /**
-   * @brief This is how the client pass information back to the server.
-   * 
-   */
-  // server.on("/runtime", HTTP_GET, [](AsyncWebServerRequest *request) {
-  //   // Take 'runtime' parameter from the request object.
-  //   AsyncWebParameter *p = request->getParam(0);
-  //   processRuntimeRequest(p);
+  // Responce for setting new leds brightness.
+  skyNetStruct->server->on("/setLedsBrightness", HTTP_GET, [skyNetStruct](AsyncWebServerRequest *request) {
+    AsyncWebParameter *p = request->getParam(0);
+    Serial.println("Got HTTP_GET on '/setLedsBrightness'");
+    Serial.println(p->name());
+    Serial.println(p->value());
 
-  /**
-   * @brief Send back to client "OK" message, and the desired value (as a confirmation)
-   * 
-   */
-  //   if (runtime == RUNTIME_OFF_VALUE)
-  //   {
-  //     request->send_P(200, "text/plain", "off");
-  //   }
-  //   else
-  //   {
-  //     request->send_P(200, "text/plain", String(runtime).c_str());
-  //   }
-  // });
+    if (!skyNetStruct->preferences.begin("SkyNetCloud"))
+    {
+      Serial.println("Could not initiate 'preference', on setLedsBrightness. Aborting");
+      request->send_P(200, "text/plain", "Error, server could not open preferences storace object.");
+      return;
+    }
 
-  // server.on("/frequency", HTTP_GET, [](AsyncWebServerRequest *request) {
-  //   // Take 'runtime' parameter from the request object.
-  //   AsyncWebParameter *p = request->getParam(0);
-  //   processFrequencyRequest(p);
-  //   request->send_P(200, "text/plain", String(frequency_hours).c_str());
-  // });
+    ///< @brief Expected values between 0-255
+    auto brightness = p->value().toInt();
 
-  // server.on("/isSystemWatering", HTTP_GET, [](AsyncWebServerRequest *request) {
-  //   request->send_P(200, "text/plain", String(isSystemWatering).c_str());
-  // });
+    // Store new value EEPROM.
+    skyNetStruct->preferences.putInt("LedBrightness", brightness);
+    skyNetStruct->preferences.end();
 
-  /**
-   * @brief Simple where the client is sending GET request, and the server send back as a respond information.
-   * 
-   */
-  // server.on("/getFrequency", HTTP_GET, [](AsyncWebServerRequest *request) {
-  //   request->send_P(200, "text/plain", String(frequency_hours).c_str());
-  // });
+    // Store new value in memory.
+    skyNetStruct->ledsSettings.leds_brightness = brightness;
+    skyNetStruct->ledsSettings.is_brightness_changed = true;
 
-  // server.on("/getRunTime", HTTP_GET, [](AsyncWebServerRequest *request) {
-  //   if (runtime == RUNTIME_ON_VALUE)
-  //   {
-  //     request->send_P(200, "text/plain", "on");
-  //   }
-  //   else if (runtime == RUNTIME_OFF_VALUE)
-  //   {
-  //     request->send_P(200, "text/plain", "off");
-  //   }
-  //   else
-  //   {
-  //     request->send_P(200, "text/plain", String(runtime).c_str());
-  //   }
-  // });
+    request->send_P(200, "text/plain", "Brightness updated successfully");
+  });
 
-  // server.on("/getTimeLeft", HTTP_GET, [](AsyncWebServerRequest *request) {
-  //   request->send_P(200, "text/plain", String(time_left_until_next_watering_min).c_str());
-  // });
+  // Responce for getting current Weather.
+  skyNetStruct->server->on("/getLedsBrightness", HTTP_GET, [skyNetStruct](AsyncWebServerRequest *request) {
+    Serial.println("Got HTTP_GET on '/getLedsBrightness'");
+    if (!skyNetStruct->preferences.begin("SkyNetCloud"))
+    {
+      Serial.println("Could not initiate 'preference', on getLedsBrightness. Aborting");
+      request->send_P(200, "text/plain", "Error, server could not open preferences storace object.");
+      return;
+    }
+    skyNetStruct->ledsSettings.leds_brightness = skyNetStruct->preferences.getInt("LedBrightness");
+    skyNetStruct->ledsSettings.is_brightness_changed = true;
+
+    request->send_P(200, "text/plain", String(skyNetStruct->ledsSettings.leds_brightness).c_str());
+    skyNetStruct->preferences.end();
+  });
 
   // Start server
   skyNetStruct->server->begin();

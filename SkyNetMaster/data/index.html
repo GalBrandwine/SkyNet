@@ -51,9 +51,19 @@
     <br>
 
     <br>
-    <h2>Time and date settings</h2>
+
     <div class="side-by-side">
         <div class="note">
+            <h2>Brightness settings</h2>
+            <input type="range" min="0" max="255" value="50" class="slider" id="ledBrightness">
+        </div>
+    </div>
+
+    <br>
+
+    <div class="side-by-side">
+        <div class="note">
+            <h2>Time and date settings</h2>
             <div class="dropdown">
                 <button class="dropbtn">Hours</button>
                 <div class="dropdown-content">
@@ -332,6 +342,7 @@
 
 <script>
     window.onload = function () {
+        getLedsBrightness();
         // getFrequency();
         // getRunTime();
         // isSystemWatering();
@@ -463,7 +474,31 @@
     //     xhttp.send();
     // }
 
-    // setInterval(getTimeLeft, 30000); //Every 30 secs.
+    // Get leds current brightness
+    function getLedsBrightness() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            document.getElementById("ledBrightness").value = this.responseText
+        };
+
+        xhttp.open("GET", "/getLedsBrightness", true);
+        xhttp.send();
+    }
+    // On input from slider, open HTTP_GET request and send it to server
+    document.getElementById("ledBrightness").oninput = function () {
+        var xhttp = new XMLHttpRequest();
+        // xhttp.onreadystatechange = function () {
+        //     if (this.readyState == 4 && this.status == 200) {
+        //         if (this.responseText == 0)
+        //             alert("Server confirms with no acknowledgement");
+        //         else
+        //             alert("Server confirm new led value: " + this.responseText);
+        //     }
+        // };
+
+        xhttp.open("GET", "/setLedsBrightness" + "?brightness=" + this.value, true);
+        xhttp.send();
+    }
 
     // Set new system time in the server, use 'hour' as a parameter.
     function setCurrentSystemTimeHour(hour) {

@@ -9,9 +9,9 @@
 #define SUNSET_TIME_HOUR 19
 #define SUNRISE_TIME_HOUR 6
 
-// Months
 #define WINTER_START 10
 #define WINTER_END 4
+
 #define SUMMER_START 5
 #define SUMMER_END 9
 
@@ -37,8 +37,8 @@ const CHSV timeOfDayToHSV(const SkyNetStruct &skyNetStruct)
     if (hours < SUNSET_TIME_HOUR)
         value = map8(hourAngle, MIN_BRIGHTNESS, MAX_BRIGHTNESS);
     else
-        // value = map8(hourAngle, MAX_BRIGHTNESS, MIN_BRIGHTNESS);
-        value = map(hourAngle, 0, 360, MAX_BRIGHTNESS, MIN_BRIGHTNESS);
+        value = map8(hourAngle, MIN_BRIGHTNESS, MAX_BRIGHTNESS);
+        value = map(hours, 1, 24, MAX_BRIGHTNESS, MIN_BRIGHTNESS);
 
     Serial.print("\ntimeOfDayToHSV\n");
     Serial.print("For hour: ");
@@ -78,18 +78,6 @@ const int weather_to_sat(const SkyNetStruct &skyNetStruct)
         sat = 255;
     }
     return sat;
-}
-
-/**
- * @brief Set the Brightness object
- * 
- * @param skyNetStruct 
- */
-void setBrightness(SkyNetStruct &skyNetStruct)
-{
-    Serial.println("Setting brightness");
-    FastLED.setBrightness(skyNetStruct.ledsSettings.leds_brightness);
-    skyNetStruct.ledsSettings.is_brightness_changed = false;
 }
 
 /**
@@ -163,28 +151,6 @@ void showProgramRandom(int numIterations, long delayTime)
     }
 }
 
-void showProgramError(int numIterations)
-{
-    for (int iteration = 0; iteration < numIterations; ++iteration)
-    {
-        for (int i = 0; i < NUM_LEDS; ++i)
-        {
-            // leds[i] = CHSV(random8(), 255, 255); // hue, saturation, value
-            leds[i].setColorCode(CRGB::Red);
-        }
-        FastLED.show();
-
-        for (int i = 0; i < NUM_LEDS; ++i)
-        {
-            leds[i] = CRGB::Black;
-        }
-        FastLED.show();
-
-        // Delay between lightnings
-        delay(500);
-    }
-}
-
 /**
  * @brief switches off all LEDs
  * 
@@ -203,7 +169,7 @@ void showProgramCleanUp(long delayTime)
  * @brief Init the FastLED driver.
  * 
  */
-void initLeds(const SkyNetStruct &skyNetStruct)
+void initLeds()
 {
     delay(1000);                                                                                     // initial delay of a few seconds is recommended
     FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip); // initializes LED strip

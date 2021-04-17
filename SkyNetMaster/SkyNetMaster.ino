@@ -1,3 +1,4 @@
+
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <WiFiAP.h>
@@ -20,6 +21,7 @@
  * * * Using the RTC                https://create.arduino.cc/projecthub/MisterBotBreak/how-to-use-a-real-time-clock-module-ds3231-bc90fe
  * * * * Depending on ds3231:       https://github.com/rodan/ds3231.git
  * * * FastLed (WS2812B led driver) https://github.com/FastLED/FastLED.git
+ * * * Preference:                  https://randomnerdtutorials.com/esp32-save-data-permanently-preferences/
  */
 
 #include <SPIFFS.h>
@@ -80,6 +82,14 @@ void setup()
   pinMode(BUILTIN_LED, OUTPUT); // set the LED pin mode
 
   /**
+   * @brief Init Leds
+   * 
+   */
+  Serial.println("Initiating leds");
+  initLeds(skyNet);
+  Serial.println("Leds initiated");
+
+  /**
    * @brief CloudMaster should create an AP.
    */
   initAccessPoint();
@@ -90,20 +100,32 @@ void setup()
 
   skyNet.server = &server;
 
-  if (setUpServer(&skyNet))
-    digitalWrite(LED_BUILTIN, HIGH);
-  else
-    digitalWrite(LED_BUILTIN, LOW);
+  // /**
+  //  * @brief Initiate preference library
+  //  *
+  //  */
+  // if (!skyNet.preferences.begin("SkyNetCloud"))
+  // {
+  //   showProgramError(3);
+  //   Serial.println("Could not initiate 'preference'. Resetting");
+  //   ESP.restart();
+  // }
 
-  delay(500);
-  digitalWrite(LED_BUILTIN, LOW);
+  if (!setUpServer(&skyNet))
+  {
+    showProgramError(3);
+    Serial.println("Could not initiate 'setUpServer'. Resetting");
+    ESP.restart();
+  }
 
-  Wire.begin();
+  if (!Wire.begin())
+  {
+    showProgramError(3);
+    Serial.println("Could not initiate 'Wire'. Resetting");
+    ESP.restart();
+  }
+
   DS3231_init(DS3231_CONTROL_INTCN);
-
-  Serial.println("Initiating leds");
-  initLeds();
-  Serial.println("Leds initiated");
 
   /**
    * @brief ****************************** OTA ************************
@@ -164,6 +186,8 @@ void loop()
    * @brief All clouds have this
    * 
    */
+  if (skyNet.ledsSettings.is_brightness_changed)
+    setBrightness(skyNet);
   showProgramTimeOfDay(skyNet);
 
   skyNet.current_weather = Weather::get_next_weather(skyNet.rtc_timestamp);
