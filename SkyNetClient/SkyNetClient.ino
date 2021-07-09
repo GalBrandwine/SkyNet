@@ -4,7 +4,7 @@
 #include <WiFiAP.h>
 
 /**
- * @file SkyNetMaster.ino
+ * @file SkyNetClient.ino
  * @author your name (you@domain.com)
  * @brief 
  * @version 0.1
@@ -37,8 +37,12 @@ int lighting_counter = 0;
 int lightning_modulo_base = random(5, 10);
 SkyNetStruct skyNet;
 
-AsyncWebServer server(80);
+// AsyncWebServer server(80);
 
+/**
+ * @brief This belongs to SkyNetMaster
+ * 
+ */
 void initAccessPoint()
 {
   Serial.println();
@@ -62,18 +66,30 @@ void initAccessPoint()
 void initExistingWifiConnection()
 {
   // We start by connecting to a WiFi network
-  WiFi.begin(ssidWifi, passwordWifi);
+  WiFi.begin(ssidAP, passwordAP);
 
-  while (WiFi.status() != WL_CONNECTED)
+  int TIMEOUT = 10;
+  while ((TIMEOUT-- > 0) and WiFi.status() != WL_CONNECTED)
   {
     delay(500);
     Serial.print(".");
+  }
+
+  if (TIMEOUT <= 0)
+  {
+    showProgramError(3);
+    delay(1000);
+    Serial.println("");
+    Serial.println("WiFi not connected.");
+    Serial.println("");
+    return;
   }
 
   Serial.println("");
   Serial.println("WiFi connected.");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
+  Serial.println("");
 }
 
 void setup()
@@ -92,44 +108,47 @@ void setup()
   /**
    * @brief CloudMaster should create an AP.
    */
-  initAccessPoint();
+  // initAccessPoint();
   /**
    * @brief Cloud slave should connect to existing SkyNetWifi.
-   * initExistingWifiConnection();
    */
+  initExistingWifiConnection();
 
-  skyNet.server = &server;
+  /**
+ * @brief Only in master
+ * @todo Remove this in client
+ * 
+ */
+  // skyNet.server = &server;
 
-  // /**
-  //  * @brief Initiate preference library
-  //  *
-  //  */
-  // if (!skyNet.preferences.begin("SkyNetCloud"))
+  /**
+ * @brief Only in master
+ * @todo Remove this in client
+ * 
+ */
+  // if (!setUpServer(&skyNet))
   // {
   //   showProgramError(3);
-  //   Serial.println("Could not initiate 'preference'. Resetting");
+  //   Serial.println("Could not initiate 'setUpServer'. Resetting");
   //   ESP.restart();
   // }
 
-  if (!setUpServer(&skyNet))
-  {
-    showProgramError(3);
-    Serial.println("Could not initiate 'setUpServer'. Resetting");
-    ESP.restart();
-  }
-
   /**
-   * @brief I2C initiation
+   * @brief No I2C in clients
    * 
    */
-  if (!Wire.begin())
-  {
-    showProgramError(3);
-    Serial.println("Could not initiate 'Wire'. Resetting");
-    ESP.restart();
-  }
+  // if (!Wire.begin())
+  // {
+  //   showProgramError(3);
+  //   Serial.println("Could not initiate 'Wire'. Resetting");
+  //   ESP.restart();
+  // }
 
-  DS3231_init(DS3231_CONTROL_INTCN);
+  /**
+   * @brief No RTC in clients
+   * 
+   */
+  // DS3231_init(DS3231_CONTROL_INTCN);
 
   /**
    * @brief ****************************** OTA ************************
@@ -179,11 +198,25 @@ void loop()
    * @brief If I'm CloudMaster
    * 
    */
-  DS3231_get(&skyNet.rtc_timestamp);
-  TimeParsing::to_string(skyNet.rtc_timestamp, skyNet.time_str);
-  Serial.print("\n");
-  Serial.print(skyNet.time_str);
-  Serial.print("\n");
+  // DS3231_get(&skyNet.rtc_timestamp);
+  // time_to_string(skyNet.rtc_timestamp, skyNet.time_str);
+  // Serial.print("\n");
+  // Serial.print(skyNet.time_str);
+  // Serial.print("\n");
+  // delay(1000);
+
+  if (WiFi.status() != WL_CONNECTED)
+  {
+    Serial.printf("Connection lost, retrying...");
+    initExistingWifiConnection();
+  }
+
+  /**
+   * @brief If I'm CloudClient, I use HTTP get from master
+   * @todo add HTTPGetLedBrightness
+   * @todo add HTTPGetCurrentWheather
+   */
+  HTTPgetCurrentSystemTime(skyNet.rtc_timestamp);
   delay(1000);
 
   /**

@@ -61,3 +61,4 @@ ArduinoOutput/SkyNetMaster.ino.bin
 ArduinoOutput/SkyNetMaster.ino.partitions.bin
 ArduinoOutput/preproc/ctags_target_for_gcc_minus_e.cpp
 ArduinoOutput/sketch/SkyNetMaster.ino.cpp
+ArduinoOutput/*

@@ -1,6 +1,8 @@
+#include <HTTPClient.h>
 #include <Preferences.h>
 #include "ESPAsyncWebServer.h"
 #include "SPIFFS.h"
+#include "RTCsettings.h"
 
 bool setUpServer(SkyNetStruct *skyNetStruct)
 {
@@ -75,7 +77,14 @@ bool setUpServer(SkyNetStruct *skyNetStruct)
                              {
                                Serial.print("Received new year setting: ");
                                Serial.println(p->value());
-                               skyNetStruct->rtc_timestamp.year = p->value().toInt();
+                               auto year = p->value().toInt();
+                               if (year <= 1976 or year >= 9999)
+                               {
+                                 Serial.print("Bad data received, filtering");
+                                 return;
+                               }
+
+                               skyNetStruct->rtc_timestamp.year = year;
                                DS3231_set(skyNetStruct->rtc_timestamp);
                              }
                            });
@@ -161,4 +170,44 @@ bool setUpServer(SkyNetStruct *skyNetStruct)
 
   Serial.println("Server started");
   return true;
+}
+
+/**
+ * @brief Create and send HTTP.Get(current-system-time) to the SkyNetMaster
+ * 
+ * @param[out] client_time 
+ */
+void HTTPgetCurrentSystemTime(ts &client_time)
+{
+  HTTPClient http;
+
+  /**
+   * @brief Create system-time url
+   * 
+   */
+  http.begin("http://192.168.4.1/getCurrentSystemTime");
+  // start connection and send HTTP header
+  int httpCode = http.GET();
+
+  // httpCode will be negative on error
+  if (httpCode > 0)
+  {
+    // HTTP header has been send and Server response header has been handled
+    Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+
+    // file found at server
+    if (httpCode == HTTP_CODE_OK)
+    {
+      String payload = http.getString();
+      Serial.println(payload);
+
+      TimeParsing::to_time(payload, client_time);
+    }
+  }
+  else
+  {
+    Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+  }
+
+  http.end();
 }
