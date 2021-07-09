@@ -2,10 +2,13 @@
 #define DATA_PIN 27
 #define LED_TYPE WS2812
 #define COLOR_ORDER GRB
-#define NUM_LEDS 6
+#define NUM_LEDS_IN_GROUP 6
+#define NUM_OF_GROUPS 3
 #define BRIGHTNESS 96
 #define MIN_BRIGHTNESS 50
 #define MAX_BRIGHTNESS 255
+
+// Sunset/Sunrise
 #define SUNSET_TIME_HOUR 19
 #define SUNRISE_TIME_HOUR 6
 
@@ -15,7 +18,7 @@
 #define SUMMER_START 5
 #define SUMMER_END 9
 
-CRGB leds[NUM_LEDS];
+CRGB leds[NUM_LEDS_IN_GROUP * NUM_OF_GROUPS];
 
 const int weather_to_sat(const SkyNetStruct &skyNetStruct);
 /**
@@ -45,8 +48,6 @@ const CHSV timeOfDayToHSV(const SkyNetStruct &skyNetStruct)
     Serial.println(hours);
     Serial.print("Got hourAngle: ");
     Serial.println(hourAngle);
-    // Serial.print("Got hue: ");
-    // Serial.println(hue);
     Serial.print("sat: ");
     Serial.println(sat);
     Serial.print("And value: ");
@@ -101,7 +102,7 @@ void showProgramTimeOfDay(const SkyNetStruct &skyNetStruct)
 {
     auto newHsv = timeOfDayToHSV(skyNetStruct);
     // auto seasonRGB = weather_to_rbg(skyNetStruct);
-    for (int i = 0; i < NUM_LEDS; ++i)
+    for (int i = 0; i < NUM_LEDS_IN_GROUP * NUM_LEDS_IN_GROUP; ++i)
     {
         leds[i].setHSV(newHsv.h, newHsv.s, newHsv.v);
     }
@@ -118,18 +119,20 @@ void doLightning(int numIterations, long delayTime)
 {
     // Save current color
     auto current_color = leds[0];
-
+    auto light_group_number = random(0, NUM_OF_GROUPS);
+    Serial.print("Doing lightning in group: ");
+    Serial.println(light_group_number);
     for (int iteration = 0; iteration < numIterations; ++iteration)
     {
-        for (int i = 0; i < NUM_LEDS; ++i)
+        for (int i = 0; i < NUM_LEDS_IN_GROUP; ++i)
         {
-            leds[i] = CRGB::White;
+            leds[light_group_number * NUM_LEDS_IN_GROUP + i] = CRGB::White;
         }
         FastLED.show();
 
-        for (int i = 0; i < NUM_LEDS; ++i)
+        for (int i = 0; i < NUM_LEDS_IN_GROUP; ++i)
         {
-            leds[i] = CRGB::Black;
+            leds[light_group_number * NUM_LEDS_IN_GROUP + i] = CRGB::Black;
         }
         FastLED.show();
 
@@ -138,9 +141,9 @@ void doLightning(int numIterations, long delayTime)
     }
 
     // Done with lighting, restoring old settings
-    for (int i = 0; i < NUM_LEDS; ++i)
+    for (int i = 0; i < NUM_LEDS_IN_GROUP; ++i)
     {
-        leds[i] = current_color;
+        leds[light_group_number * NUM_LEDS_IN_GROUP + i] = current_color;
     }
 }
 
@@ -154,7 +157,7 @@ void showProgramRandom(int numIterations, long delayTime)
 {
     for (int iteration = 0; iteration < numIterations; ++iteration)
     {
-        for (int i = 0; i < NUM_LEDS; ++i)
+        for (int i = 0; i < NUM_LEDS_IN_GROUP; ++i)
         {
             // leds[i] = CHSV(random8(), 255, 255); // hue, saturation, value
             leds[i].setHSV(random8(), 255, 255);
@@ -167,14 +170,14 @@ void showProgramError(int numIterations)
 {
     for (int iteration = 0; iteration < numIterations; ++iteration)
     {
-        for (int i = 0; i < NUM_LEDS; ++i)
+        for (int i = 0; i < NUM_LEDS_IN_GROUP * NUM_LEDS_IN_GROUP; ++i)
         {
             // leds[i] = CHSV(random8(), 255, 255); // hue, saturation, value
             leds[i].setColorCode(CRGB::Red);
         }
         FastLED.show();
 
-        for (int i = 0; i < NUM_LEDS; ++i)
+        for (int i = 0; i < NUM_LEDS_IN_GROUP * NUM_LEDS_IN_GROUP; ++i)
         {
             leds[i] = CRGB::Black;
         }
@@ -192,7 +195,7 @@ void showProgramError(int numIterations)
  */
 void showProgramCleanUp(long delayTime)
 {
-    for (int i = 0; i < NUM_LEDS; ++i)
+    for (int i = 0; i < NUM_LEDS_IN_GROUP * NUM_LEDS_IN_GROUP; ++i)
     {
         leds[i] = CRGB::Black;
     }
@@ -205,8 +208,8 @@ void showProgramCleanUp(long delayTime)
  */
 void initLeds(const SkyNetStruct &skyNetStruct)
 {
-    delay(1000);                                                                                     // initial delay of a few seconds is recommended
-    FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip); // initializes LED strip
-    FastLED.setBrightness(BRIGHTNESS);                                                               // global brightness
+    delay(1000);                                                                                                              // initial delay of a few seconds is recommended
+    FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS_IN_GROUP * NUM_OF_GROUPS).setCorrection(TypicalLEDStrip); // initializes LED strip
+    FastLED.setBrightness(BRIGHTNESS);                                                                                        // global brightness
     showProgramCleanUp(100);
 }
