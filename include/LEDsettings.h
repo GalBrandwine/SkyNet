@@ -18,6 +18,11 @@
 #define SUMMER_START 5
 #define SUMMER_END 9
 
+#define IM_SLAVE "Compiling SkyNet for slave version"
+
+static const uint8_t RAIN_PIN = 15;
+static bool IS_RAINING = false;
+
 CRGB leds[NUM_LEDS_IN_GROUP * NUM_OF_GROUPS];
 
 const int weather_to_sat(const SkyNetStruct &skyNetStruct);
@@ -202,6 +207,22 @@ void showProgramCleanUp(long delayTime)
     FastLED.delay(delayTime);
 }
 
+void frequencyTask(void *pvParameters);
+void InitRainStuff()
+{
+    pinMode(RAIN_PIN, OUTPUT); // Declare the LED as an output
+
+    // xTaskCreate should be in SETUP() function - if not the scheduler is not working properly, and there's a xTaskCreate shadowing.
+    xTaskCreate(
+        frequencyTask, // Function that should be called
+        "Rain task",   // Name of the task (for debugging)
+        1000,          // Stack size (bytes)
+        NULL,          // Parameter to pass
+        1,             // Task priority
+        NULL           // Task handle
+    );
+}
+
 /**
  * @brief Init the FastLED driver.
  * 
@@ -212,4 +233,120 @@ void initLeds(const SkyNetStruct &skyNetStruct)
     FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS_IN_GROUP * NUM_OF_GROUPS).setCorrection(TypicalLEDStrip); // initializes LED strip
     FastLED.setBrightness(BRIGHTNESS);                                                                                        // global brightness
     showProgramCleanUp(100);
+
+#ifdef IM_SLAVE
+    InitRainStuff();
+#endif IM_SLAVE
+}
+
+void StartRain()
+{
+    IS_RAINING = true;
+    // digitalWrite(pin_number, HIGH); // Turn the LED on
+}
+
+void StopRain()
+{
+    IS_RAINING = false;
+    // digitalWrite(pin_number, LOW); // Turn the LED off
+}
+
+void frequencyTask(void *pvParameters)
+{
+    int TICKS = 100;
+    // int seconds = 0;
+    // int valveTime = 0;
+    // int hours_passed_from_last_watering = 0; //max watering interval is 168 hours (a week)
+
+    for (;;)
+    {
+
+        // seconds++;
+        // StartRain(RAIN_PIN);
+        if (IS_RAINING)
+        {
+            digitalWrite(RAIN_PIN, HIGH); // Turn the LED on
+            vTaskDelay(pdMS_TO_TICKS(TICKS));
+            digitalWrite(RAIN_PIN, LOW); // Turn the LED on
+            vTaskDelay(pdMS_TO_TICKS(TICKS));
+        }
+        else
+            vTaskDelay(pdMS_TO_TICKS(TICKS * 10));
+        // if (seconds % 3600 == 0)
+        // { //10
+        //     hours_passed_from_last_watering++;
+        // }
+        // Debug
+        //    Serial.print("frequencyTask::isSystemWatering: ");Serial.println(isSystemWatering);
+        //    Serial.print("frequencyTask::FREQUENCY_RESET_VALUE: ");Serial.println(FREQUENCY_RESET_VALUE);
+        //    Serial.print("frequencyTask::frequency_hours: ");Serial.println(frequency_hours);
+        //    Serial.print("frequencyTask::frequency_hours in seconds: ");Serial.println(frequency_hours*3600);
+        //    Serial.print("frequencyTask::seconds passed from last watering: ");Serial.println(seconds);
+        //    Serial.print("frequencyTask::hours_passed_from_last_watering: ");Serial.println(hours_passed_from_last_watering);
+        //    Serial.print("frequencyTask::valveTime: ");Serial.println(valveTime);
+        //    Serial.println("");
+
+        // if (frequency_hours != FREQUENCY_RESET_VALUE)
+        // {
+        //     seconds = seconds % (frequency_hours * 3600);                            // Frequency_hours in seconds. (If frequency_hours==0) then it throws DivisionByZero!!)
+        //     time_left_until_next_watering_min = frequency_hours * 60 - seconds / 60; // hours_passed_from_last_watering;
+        // }
+        // else
+        // {
+        //     seconds = 0;
+        //     valveTime = seconds;
+        //     hours_passed_from_last_watering = 0;
+        //     Serial.println("frequencyTask::hours_passed_from_last_watering RESETED ");
+        // }
+
+        // xSemaphoreTake(xMutex, portMAX_DELAY); // Start critical section, that accessing SHARED data.
+        // switch (valveMode)
+        // {
+        // case VALVE_MODES::timer:
+        //     Serial.print(seconds - valveTime);
+        //     Serial.print(" ");
+        //     Serial.println(runtime * 60);
+        //     if (seconds - valveTime >= runtime * 60)
+        //     {
+        //         if (closeValve())
+        //         {
+        //             isSystemWatering = false;
+        //             valveTime = 0;
+        //         }
+        //     }
+        //     if (hours_passed_from_last_watering >= frequency_hours && frequency_hours != FREQUENCY_RESET_VALUE)
+        //     { // Time to water the plants.
+        //         Serial.println("frequencyTask::TIME TO WATER THE PLANTS");
+        //         if (!isSystemWatering)
+        //         {
+        //             if (openValve())
+        //             {
+        //                 isSystemWatering = true;
+        //                 hours_passed_from_last_watering = 0;
+        //                 valveTime = seconds;
+        //             }
+        //         }
+        //     }
+        //     break;
+        // case VALVE_MODES::valve_open:
+        //     if (openValve())
+        //     {
+        //         isSystemWatering = true;
+        //         valveTime = seconds;
+        //     }
+        //     break;
+        // case VALVE_MODES::valve_close:
+        //     if (closeValve())
+        //     {
+        //         isSystemWatering = false;
+        //     }
+        //     break;
+        // default:
+        //     // statements
+        //     break;
+        // }
+        // xSemaphoreGive(xMutex); // end start critical section
+    }
+
+    vTaskDelete(NULL);
 }

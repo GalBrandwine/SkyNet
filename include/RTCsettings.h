@@ -185,6 +185,7 @@ namespace TimeParsing
             temp += uint8_t(*pch - '0');
             pch++;
         }
+        time.hour = temp;
         Serial.print(temp);
         Serial.print(" ");
         pch++;
@@ -203,6 +204,7 @@ namespace TimeParsing
             temp += uint8_t(*pch - '0');
             pch++;
         }
+        time.min = temp;
         Serial.print(temp);
         Serial.print(" ");
         pch++;
@@ -220,8 +222,9 @@ namespace TimeParsing
             temp += uint8_t(*pch - '0');
             pch++;
         }
+        time.sec = temp;
         Serial.print(temp);
-        Serial.print(" ");
+        Serial.printf(" \n");
     }
 
     /**

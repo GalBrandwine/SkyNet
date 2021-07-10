@@ -32,6 +32,7 @@
 #include "/home/gal/dev/SkyNet/include/RTCsettings.h"
 #include "/home/gal/dev/SkyNet/include/LEDsettings.h"
 #include "/home/gal/dev/SkyNet/include/Weathersettings.h"
+#include "/home/gal/dev/SkyNet/include/HTTPClientGetters.h"
 
 int lighting_counter = 0;
 int lightning_modulo_base = random(5, 10);
@@ -45,18 +46,18 @@ SkyNetStruct skyNet;
  */
 void initAccessPoint()
 {
-  Serial.println();
-  Serial.println("Configuring access point...");
-  // You can remove the password parameter if you want the AP to be open.
-  WiFi.softAP(ssidAP, passwordAP);
-  Serial.println(WiFi.softAPSSID());
+    Serial.println();
+    Serial.println("Configuring access point...");
+    // You can remove the password parameter if you want the AP to be open.
+    WiFi.softAP(ssidAP, passwordAP);
+    Serial.println(WiFi.softAPSSID());
 
-  IPAddress myIP = WiFi.softAPIP();
-  Serial.print("AP IP address: ");
-  Serial.println(myIP);
+    IPAddress myIP = WiFi.softAPIP();
+    Serial.print("AP IP address: ");
+    Serial.println(myIP);
 
-  // Print ESP32 Local IP Address
-  Serial.println(WiFi.localIP());
+    // Print ESP32 Local IP Address
+    Serial.println(WiFi.localIP());
 }
 
 /**
@@ -65,181 +66,201 @@ void initAccessPoint()
  */
 void initExistingWifiConnection()
 {
-  // We start by connecting to a WiFi network
-  WiFi.begin(ssidAP, passwordAP);
+    // We start by connecting to a WiFi network
+    WiFi.begin(ssidAP, passwordAP);
 
-  int TIMEOUT = 10;
-  while ((TIMEOUT-- > 0) and WiFi.status() != WL_CONNECTED)
-  {
-    delay(500);
-    Serial.print(".");
-  }
+    int TIMEOUT = 10;
+    while ((TIMEOUT-- > 0) and WiFi.status() != WL_CONNECTED)
+    {
+        delay(500);
+        Serial.print(".");
+    }
 
-  if (TIMEOUT <= 0)
-  {
-    showProgramError(3);
-    delay(1000);
+    if (TIMEOUT <= 0)
+    {
+        showProgramError(3);
+        delay(1000);
+        Serial.println("");
+        Serial.println("WiFi not connected.");
+        Serial.println("");
+        return;
+    }
+
     Serial.println("");
-    Serial.println("WiFi not connected.");
+    Serial.println("WiFi connected.");
+    Serial.println("IP address: ");
+    Serial.println(WiFi.localIP());
     Serial.println("");
-    return;
-  }
-
-  Serial.println("");
-  Serial.println("WiFi connected.");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
-  Serial.println("");
 }
 
 void setup()
 {
-  Serial.begin(115200);
-  pinMode(BUILTIN_LED, OUTPUT); // set the LED pin mode
+    Serial.begin(115200);
+    pinMode(BUILTIN_LED, OUTPUT); // set the LED pin mode
 
-  /**
+    /**
    * @brief Init Leds
    * 
    */
-  Serial.println("Initiating leds");
-  initLeds(skyNet);
-  Serial.println("Leds initiated");
+    Serial.println("Initiating leds");
+    initLeds(skyNet);
+    Serial.println("Leds initiated");
 
-  /**
+    /**
    * @brief CloudMaster should create an AP.
    */
-  // initAccessPoint();
-  /**
+    // initAccessPoint();
+    /**
    * @brief Cloud slave should connect to existing SkyNetWifi.
    */
-  initExistingWifiConnection();
+    initExistingWifiConnection();
 
-  /**
+    /**
  * @brief Only in master
  * @todo Remove this in client
  * 
  */
-  // skyNet.server = &server;
+    // skyNet.server = &server;
 
-  /**
+    /**
  * @brief Only in master
  * @todo Remove this in client
  * 
  */
-  // if (!setUpServer(&skyNet))
-  // {
-  //   showProgramError(3);
-  //   Serial.println("Could not initiate 'setUpServer'. Resetting");
-  //   ESP.restart();
-  // }
+    // if (!setUpServer(&skyNet))
+    // {
+    //   showProgramError(3);
+    //   Serial.println("Could not initiate 'setUpServer'. Resetting");
+    //   ESP.restart();
+    // }
 
-  /**
+    /**
    * @brief No I2C in clients
    * 
    */
-  // if (!Wire.begin())
-  // {
-  //   showProgramError(3);
-  //   Serial.println("Could not initiate 'Wire'. Resetting");
-  //   ESP.restart();
-  // }
+    // if (!Wire.begin())
+    // {
+    //   showProgramError(3);
+    //   Serial.println("Could not initiate 'Wire'. Resetting");
+    //   ESP.restart();
+    // }
 
-  /**
+    /**
    * @brief No RTC in clients
    * 
    */
-  // DS3231_init(DS3231_CONTROL_INTCN);
+    // DS3231_init(DS3231_CONTROL_INTCN);
 
-  /**
+    /**
    * @brief ****************************** OTA ************************
    * * Keep this part at the end of the INIT()
    * * Dont change  here nothing.
    */
-  ArduinoOTA
-      .onStart([]()
-               {
-                 String type;
-                 if (ArduinoOTA.getCommand() == U_FLASH)
-                   type = "sketch";
-                 else // U_SPIFFS
-                   type = "filesystem";
+    ArduinoOTA
+        .onStart([]()
+                 {
+                     String type;
+                     if (ArduinoOTA.getCommand() == U_FLASH)
+                         type = "sketch";
+                     else // U_SPIFFS
+                         type = "filesystem";
 
-                 // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-                 SPIFFS.end();
-                 Serial.println("Start updating " + type);
-               })
-      .onEnd([]()
-             { Serial.println("\nEnd"); })
-      .onProgress([](unsigned int progress, unsigned int total)
-                  { Serial.printf("Progress: %u%%\r", (progress / (total / 100))); })
-      .onError([](ota_error_t error)
-               {
-                 Serial.printf("Error[%u]: ", error);
-                 if (error == OTA_AUTH_ERROR)
-                   Serial.println("Auth Failed");
-                 else if (error == OTA_BEGIN_ERROR)
-                   Serial.println("Begin Failed");
-                 else if (error == OTA_CONNECT_ERROR)
-                   Serial.println("Connect Failed");
-                 else if (error == OTA_RECEIVE_ERROR)
-                   Serial.println("Receive Failed");
-                 else if (error == OTA_END_ERROR)
-                   Serial.println("End Failed");
-               });
+                     // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+                     SPIFFS.end();
+                     Serial.println("Start updating " + type);
+                 })
+        .onEnd([]()
+               { Serial.println("\nEnd"); })
+        .onProgress([](unsigned int progress, unsigned int total)
+                    { Serial.printf("Progress: %u%%\r", (progress / (total / 100))); })
+        .onError([](ota_error_t error)
+                 {
+                     Serial.printf("Error[%u]: ", error);
+                     if (error == OTA_AUTH_ERROR)
+                         Serial.println("Auth Failed");
+                     else if (error == OTA_BEGIN_ERROR)
+                         Serial.println("Begin Failed");
+                     else if (error == OTA_CONNECT_ERROR)
+                         Serial.println("Connect Failed");
+                     else if (error == OTA_RECEIVE_ERROR)
+                         Serial.println("Receive Failed");
+                     else if (error == OTA_END_ERROR)
+                         Serial.println("End Failed");
+                 });
 
-  ArduinoOTA.begin();
+    ArduinoOTA.begin();
 }
 
 void loop()
 {
-  ArduinoOTA.handle();
+    ArduinoOTA.handle();
 
-  /**
+    /**
    * @brief If I'm CloudMaster
    * 
    */
-  // DS3231_get(&skyNet.rtc_timestamp);
-  // time_to_string(skyNet.rtc_timestamp, skyNet.time_str);
-  // Serial.print("\n");
-  // Serial.print(skyNet.time_str);
-  // Serial.print("\n");
-  // delay(1000);
+    // DS3231_get(&skyNet.rtc_timestamp);
+    // time_to_string(skyNet.rtc_timestamp, skyNet.time_str);
+    // Serial.print("\n");
+    // Serial.print(skyNet.time_str);
+    // Serial.print("\n");
+    // delay(1000);
 
-  if (WiFi.status() != WL_CONNECTED)
-  {
-    Serial.printf("Connection lost, retrying...");
-    initExistingWifiConnection();
-  }
+    if (WiFi.status() != WL_CONNECTED)
+    {
+        Serial.printf("Connection lost, retrying...");
+        initExistingWifiConnection();
+    }
 
-  /**
+    /**
    * @brief If I'm CloudClient, I use HTTP get from master
    * @todo add HTTPGetLedBrightness
    * @todo add HTTPGetCurrentWheather
    */
-  HTTPgetCurrentSystemTime(skyNet.rtc_timestamp);
-  delay(1000);
+    HTTPgetCurrentSystemTime(skyNet.rtc_timestamp);
+    HTTPgetCurrentSystemWeather(skyNet);
+    HTTPgetCurrentSystemLedBrightness(skyNet);
 
-  /**
+    delay(1000);
+
+    /**
    * @brief All clouds have this
    * 
    */
-  if (skyNet.ledsSettings.is_brightness_changed)
-    setBrightness(skyNet);
-  showProgramTimeOfDay(skyNet);
+    if (skyNet.ledsSettings.is_brightness_changed)
+        setBrightness(skyNet);
+    showProgramTimeOfDay(skyNet);
 
-  skyNet.current_weather = Weather::get_next_weather(skyNet.rtc_timestamp);
-  Serial.print("Skynet current weather: ");
-  Serial.println(Weather::to_string(skyNet.current_weather));
+    /**
+ * @brief Only Master interprate Weather from time!
+ * 
+ */
+    // skyNet.current_weather = Weather::get_next_weather(skyNet.rtc_timestamp);
+    // Serial.print("Skynet current weather: ");
+    // Serial.println(Weather::to_string(skyNet.current_weather));
 
-  switch (skyNet.current_weather)
-  {
-  case Weather::WeatherType::Stormy:
-    lighting_counter++;
-    if ((lighting_counter % lightning_modulo_base) == 0)
+    switch (skyNet.current_weather)
     {
-      Serial.println("******* Doing lightning ******");
-      doLightning(random(5) + 1, random(50, 500) + 1);
+    case Weather::WeatherType::Rain:
+        /**
+     * @brief This case dont need a BREAK, because it is possible to have lightings douring rain
+     */
+#ifdef IM_SLAVE
+        StartRain();
+
+#endif IM_SLAVE
+        break;
+    case Weather::WeatherType::Stormy:
+        StartRain();
+        lighting_counter++;
+        if ((lighting_counter % lightning_modulo_base) == 0)
+        {
+            Serial.println("******* Doing lightning ******");
+            doLightning(random(5) + 1, random(50, 500) + 1);
+        }
+        break;
+    default:
+        StopRain();
+        break;
     }
-    break;
-  }
 }

@@ -32,21 +32,6 @@
             <a> Current weather:</a>
             <a id="currentSystemWeather"> None</a>
         </div>
-        <!-- <div class="dropdown">
-            <button class="dropbtn">Set new weather</button>
-            <div class="dropdown-content">
-                <button onclick="setCurrentSystemSystemWeather('Automatic')" class="button">Automatic</button>
-                <button onclick="setCurrentSystemSystemWeather('Sunny')" class="button">Sunny</button>
-                <button onclick="setCurrentSystemSystemWeather('PartiallyCloudy')"
-                    class="button">PartiallyCloudy</button>
-                <button onclick="setCurrentSystemSystemWeather('Cloudy')" class="button">Cloudy</button>
-                <button onclick="setCurrentSystemSystemWeather('Overcast')" class="button">Overcast</button>
-                <button onclick="setCurrentSystemSystemWeather('Rain')" class="button">Rain</button>
-                <button onclick="setCurrentSystemSystemWeather('Drizzle')" class="button">Drizzle</button>
-                <button onclick="setCurrentSystemSystemWeather('Snow')" class="button">Snow</button>
-                <button onclick="setCurrentSystemSystemWeather('Stormy')" class="button">Stormy</button>
-            </div>
-        </div> -->
     </div>
     <br>
 
@@ -224,263 +209,14 @@
     </div>
 
     <br>
-
-    <!-- <div class="note">
-        <div class="data">
-            <a> Time left until watering: </a><a id="getTimeLeft"></a><a> Minutes.</a>
-        </div>
-    </div> -->
-
-
-
     <br>
-
-    <!-- <div class="side-by-side">
-        <div class="note">
-            <div class="data">
-                <h2>FREQUENCY</h2>
-                <label class="container red">Reset
-                    <input type="radio" name="frequency" value="0" onclick="ValidateFrequency(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">1 Hour
-                    <input type="radio" name="frequency" value="1" onclick="ValidateFrequency(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">2
-                    <input type="radio" name="frequency" value="2" onclick="ValidateFrequency(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">3
-                    <input type="radio" name="frequency" value="3" onclick="ValidateFrequency(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">4
-                    <input type="radio" name="frequency" value="4" onclick="ValidateFrequency(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">6
-                    <input type="radio" name="frequency" value="6" onclick="ValidateFrequency(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">8
-                    <input type="radio" name="frequency" value="8" onclick="ValidateFrequency(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">12
-                    <input type="radio" name="frequency" value="12" onclick="ValidateFrequency(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">24
-                    <input type="radio" name="frequency" value="24" onclick="ValidateFrequency(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">48
-                    <input type="radio" name="frequency" value="48" onclick="ValidateFrequency(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">72
-                    <input type="radio" name="frequency" value="72" onclick="ValidateFrequency(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">Week
-                    <input type="radio" name="frequency" value="168" onclick="ValidateFrequency(this);">
-                    <span class="checkmark"></span>
-                </label>
-            </div>
-        </div>
-
-        <div class="note">
-            <div class="data">
-                <h2>RUN TIME</h2>
-                <label class="container red">OFF
-                    <input type="radio" name="runtime" value="off" onclick="ValidateRunTime(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">1 min
-                    <input type="radio" name="runtime" value="1" onclick="ValidateRunTime(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">3
-                    <input type="radio" name="runtime" value="3" onclick="ValidateRunTime(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">5
-                    <input type="radio" name="runtime" value="5" onclick="ValidateRunTime(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">10
-                    <input type="radio" name="runtime" value="10" onclick="ValidateRunTime(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">15
-                    <input type="radio" name="runtime" value="15" onclick="ValidateRunTime(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">20
-                    <input type="radio" name="runtime" value="20" onclick="ValidateRunTime(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">30
-                    <input type="radio" name="runtime" value="30" onclick="ValidateRunTime(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">60
-                    <input type="radio" name="runtime" value="60" onclick="ValidateRunTime(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">90
-                    <input type="radio" name="runtime" value="90" onclick="ValidateRunTime(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container">120
-                    <input type="radio" name="runtime" value="120" onclick="ValidateRunTime(this);">
-                    <span class="checkmark"></span>
-                </label>
-                <label class="container green">ON
-                    <input type="radio" name="runtime" value="on" onclick="ValidateRunTime(this);">
-                    <span class="checkmark"></span>
-                </label>
-            </div>
-        </div>
-    </div> -->
 </body>
 
 
 <script>
     window.onload = function () {
         getLedsBrightness();
-        document.getElementById("lyear").setva
-        // getFrequency();
-        // getRunTime();
-        // isSystemWatering();
-        // getTimeLeft();
     };
-
-    // function getFrequency() {
-    //     var xhttp = new XMLHttpRequest();
-    //     xhttp.onreadystatechange = function () {
-    //         if (this.readyState == 4 && this.status == 200) {
-    //             checkboxes = document.getElementsByName('frequency');
-    //             for (var i = 0, length = checkboxes.length; i < length; i++) {
-    //                 if (checkboxes[i].value == this.responseText) {
-    //                     checkboxes[i].checked = true;
-    //                     break;
-    //                 }
-    //             }
-    //         }
-    //     };
-    //     xhttp.open("GET", "/getFrequency", true);
-    //     xhttp.send();
-    // }
-
-    // setInterval(getFrequency, 1000);
-
-
-    // function getRunTime() {
-    //     var xhttp = new XMLHttpRequest();
-    //     xhttp.onreadystatechange = function () {
-    //         if (this.readyState == 4 && this.status == 200) {
-    //             checkboxes = document.getElementsByName('runtime');
-    //             for (var i = 0, length = checkboxes.length; i < length; i++) {
-    //                 if (checkboxes[i].value == this.responseText) {
-    //                     // do whatever you want with the checked radio
-    //                     checkboxes[i].checked = true;
-    //                     //alert(checkboxes[i].value);
-    //                     // only one radio can be logically checked, don't check the rest
-    //                     break;
-    //                 }
-    //             }
-    //         }
-    //     };
-    //     xhttp.open("GET", "/getRunTime", true);
-    //     xhttp.send();
-    // }
-
-    // setInterval(getRunTime, 1000);
-
-
-    // function ValidateRunTime(cb) {
-    //     if (confirm("You have selected " + cb.value + " minutes of runtime. Is that correct?")) // Raise as popup
-    //     {
-    //         var xhttp = new XMLHttpRequest();
-    //         xhttp.onreadystatechange = function () {
-    //             if (this.readyState == 4 && this.status == 200) {
-    //                 if (this.responseText == 255)
-    //                     alert("Server confirm: " + "off");
-    //                 if (this.responseText == 254)
-    //                     alert("Server confirm: " + "on");
-    //                 else
-    //                     alert("Server confirm: " + this.responseText);
-    //             }
-    //         };
-    //         xhttp.open("GET", "/runtime" + "?runtime=" + cb.value, true);
-    //         xhttp.send();
-
-    //         return true;
-    //     }
-    //     else {
-    //         cb.checked = false
-    //         return false;
-    //     }
-    // }
-
-    // function ValidateFrequency(cb) {
-    //     if (confirm("You have selected " + cb.value + " frequency. Is that correct?")) // Raise as popup
-    //     {
-    //         var xhttp = new XMLHttpRequest();
-    //         xhttp.onreadystatechange = function () {
-    //             if (this.readyState == 4 && this.status == 200) {
-    //                 if (this.responseText == 0)
-    //                     alert("Server confirm: " + "reset");
-    //                 else
-    //                     alert("Server confirm: " + this.responseText);
-    //             }
-    //         };
-
-    //         xhttp.open("GET", "/frequency" + "?frequency=" + cb.value, true);
-    //         xhttp.send();
-
-    //         return true;
-    //     }
-    //     else {
-    //         cb.checked = false
-    //         return false;
-    //     }
-    // }
-
-    // function isSystemWatering() {
-    //     var xhttp = new XMLHttpRequest();
-    //     xhttp.onreadystatechange = function () {
-    //         if (this.readyState == 4 && this.status == 200) {
-    //             if (this.responseText == 0) {
-    //                 document.getElementById("isSystemWatering").innerHTML = "not watering";
-    //                 document.getElementById('isSystemWatering').style.color = "red";
-    //             }
-    //             else {
-    //                 document.getElementById("isSystemWatering").innerHTML = "watering";
-    //                 document.getElementById('isSystemWatering').style.color = "blue";
-    //             }
-    //         }
-    //     };
-    //     xhttp.open("GET", "/isSystemWatering", true);
-    //     xhttp.send();
-    // }
-
-    // // Update the clients side - if system is watering right now. once a second
-    // setInterval(isSystemWatering, 1000);
-
-
-    // function getTimeLeft() {
-    //     var xhttp = new XMLHttpRequest();
-    //     xhttp.onreadystatechange = function () {
-    //         if (this.readyState == 4 && this.status == 200) {
-    //             document.getElementById("getTimeLeft").innerHTML = this.responseText;
-    //         }
-    //     };
-    //     xhttp.open("GET", "/getTimeLeft", true);
-    //     xhttp.send();
-    // }
 
     // Get leds current brightness
     function getLedsBrightness() {
@@ -496,15 +232,6 @@
     // On input from slider, open HTTP_GET request and send it to server
     document.getElementById("ledBrightness").oninput = function () {
         var xhttp = new XMLHttpRequest();
-        // xhttp.onreadystatechange = function () {
-        //     if (this.readyState == 4 && this.status == 200) {
-        //         if (this.responseText == 0)
-        //             alert("Server confirms with no acknowledgement");
-        //         else
-        //             alert("Server confirm new led value: " + this.responseText);
-        //     }
-        // };
-
         xhttp.open("GET", "/setLedsBrightness" + "?brightness=" + this.value, true);
         xhttp.send();
     }
@@ -525,7 +252,9 @@
 
     // On input from slider, open HTTP_GET request and send it to server
     document.getElementById("lyear").onkeypress = function () {
-        setCurrentSystemTimeYear(this.value)
+        if (this.event.key === 'Enter') {
+            setCurrentSystemTimeYear(this.value);
+        }
     }
 
     // Set new system date in the server, use 'month' as a parameter.
@@ -534,7 +263,7 @@
         xhttp.open("GET", "/setCurrentSystemTime" + "?year=" + year, true);
         xhttp.send();
     }
-    
+
     // Set new system date in the server, use 'month' as a parameter.
     function setCurrentSystemTimeMonth(month) {
         var xhttp = new XMLHttpRequest();
@@ -580,7 +309,7 @@
         xhttp.send();
     }
 
-    setInterval(getCurrentSystemWeather, 1000); //Every 1 secs.
+    setInterval(getCurrentSystemWeather, 10000); //Every 10 secs.
 
 
 

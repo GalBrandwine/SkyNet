@@ -1,4 +1,4 @@
-#include <HTTPClient.h>
+// #include <HTTPClient.h>
 #include <Preferences.h>
 #include "ESPAsyncWebServer.h"
 #include "SPIFFS.h"
@@ -51,6 +51,7 @@ bool setUpServer(SkyNetStruct *skyNetStruct)
                                Serial.println(p->value());
                                skyNetStruct->rtc_timestamp.hour = p->value().toInt();
                                DS3231_set(skyNetStruct->rtc_timestamp);
+                               request->send_P(200, "text/plain", "OK set hour");
                              }
                              if (p->name() == "minute")
                              {
@@ -58,6 +59,7 @@ bool setUpServer(SkyNetStruct *skyNetStruct)
                                Serial.println(p->value());
                                skyNetStruct->rtc_timestamp.min = p->value().toInt();
                                DS3231_set(skyNetStruct->rtc_timestamp);
+                               request->send_P(200, "text/plain", "OK set minute");
                              }
                              if (p->name() == "day")
                              {
@@ -65,6 +67,7 @@ bool setUpServer(SkyNetStruct *skyNetStruct)
                                Serial.println(p->value());
                                skyNetStruct->rtc_timestamp.mday = p->value().toInt();
                                DS3231_set(skyNetStruct->rtc_timestamp);
+                               request->send_P(200, "text/plain", "OK set day");
                              }
                              if (p->name() == "month")
                              {
@@ -72,6 +75,7 @@ bool setUpServer(SkyNetStruct *skyNetStruct)
                                Serial.println(p->value());
                                skyNetStruct->rtc_timestamp.mon = p->value().toInt();
                                DS3231_set(skyNetStruct->rtc_timestamp);
+                               request->send_P(200, "text/plain", "OK set month");
                              }
                              if (p->name() == "year")
                              {
@@ -81,11 +85,14 @@ bool setUpServer(SkyNetStruct *skyNetStruct)
                                if (year <= 1976 or year >= 9999)
                                {
                                  Serial.print("Bad data received, filtering");
+
+                                 request->send_P(400, "text/plain", "Year Not Implemented");
                                  return;
                                }
 
                                skyNetStruct->rtc_timestamp.year = year;
                                DS3231_set(skyNetStruct->rtc_timestamp);
+                               request->send_P(200, "text/plain", "OK set year");
                              }
                            });
 
@@ -100,6 +107,7 @@ bool setUpServer(SkyNetStruct *skyNetStruct)
                              Serial.println(p->name());
                              Serial.println(p->value());
                              skyNetStruct->current_weather = Weather::to_weather(p->value());
+                             request->send_P(200, "text/plain", "OK set Weather");
                            });
 
   // Responce for getting current Weather.
@@ -120,7 +128,8 @@ bool setUpServer(SkyNetStruct *skyNetStruct)
                              if (!skyNetStruct->preferences.begin("SkyNetCloud"))
                              {
                                Serial.println("Could not initiate 'preference', on setLedsBrightness. Aborting");
-                               request->send_P(200, "text/plain", "Error, server could not open preferences storace object.");
+                               // 500 Internal Server Error
+                               request->send_P(500, "text/plain", "Error, server could not open preferences storace object.");
                                return;
                              }
 
@@ -145,7 +154,7 @@ bool setUpServer(SkyNetStruct *skyNetStruct)
                              if (!skyNetStruct->preferences.begin("SkyNetCloud"))
                              {
                                Serial.println("Could not initiate 'preference', on getLedsBrightness. Aborting");
-                               request->send_P(200, "text/plain", "Error, server could not open preferences storace object.");
+                               request->send_P(500, "text/plain", "Error, server could not open preferences storace object.");
                                return;
                              }
                              skyNetStruct->ledsSettings.leds_brightness = skyNetStruct->preferences.getInt("LedBrightness");
@@ -170,44 +179,4 @@ bool setUpServer(SkyNetStruct *skyNetStruct)
 
   Serial.println("Server started");
   return true;
-}
-
-/**
- * @brief Create and send HTTP.Get(current-system-time) to the SkyNetMaster
- * 
- * @param[out] client_time 
- */
-void HTTPgetCurrentSystemTime(ts &client_time)
-{
-  HTTPClient http;
-
-  /**
-   * @brief Create system-time url
-   * 
-   */
-  http.begin("http://192.168.4.1/getCurrentSystemTime");
-  // start connection and send HTTP header
-  int httpCode = http.GET();
-
-  // httpCode will be negative on error
-  if (httpCode > 0)
-  {
-    // HTTP header has been send and Server response header has been handled
-    Serial.printf("[HTTP] GET... code: %d\n", httpCode);
-
-    // file found at server
-    if (httpCode == HTTP_CODE_OK)
-    {
-      String payload = http.getString();
-      Serial.println(payload);
-
-      TimeParsing::to_time(payload, client_time);
-    }
-  }
-  else
-  {
-    Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
-  }
-
-  http.end();
 }
