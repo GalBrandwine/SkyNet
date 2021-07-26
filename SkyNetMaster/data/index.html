@@ -203,6 +203,7 @@
                 <button class="dropbtn dropbtn_date">Year</button>
                 <div class="dropdown-content">
                     <input type="number" id="lyear" name="lyear">
+                    <button onclick="getValueFromInputText()">OK</button>
                 </div>
             </div>
         </div>
@@ -250,12 +251,19 @@
         xhttp.send();
     }
 
-    // On input from slider, open HTTP_GET request and send it to server
-    document.getElementById("lyear").onkeypress = function () {
-        if (this.event.key === 'Enter') {
-            setCurrentSystemTimeYear(this.value);
+    function getValueFromInputText() {
+        var value = document.getElementById("lyear").value;
+        if (value.length != 0) {
+            setCurrentSystemTimeYear(value);
         }
+
     }
+    // On input from slider, open HTTP_GET request and send it to server
+    // document.getElementById("lyear").onkeypress = function () {
+    //     if (this.event.key === 'Enter') {
+    //         setCurrentSystemTimeYear(this.value);
+    //     }
+    // }
 
     // Set new system date in the server, use 'month' as a parameter.
     function setCurrentSystemTimeYear(year) {

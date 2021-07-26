@@ -229,29 +229,26 @@ void loop()
    */
     if (skyNet.ledsSettings.is_brightness_changed)
         setBrightness(skyNet);
-    showProgramTimeOfDay(skyNet);
 
-    /**
- * @brief Only Master interprate Weather from time!
- * 
- */
-    // skyNet.current_weather = Weather::get_next_weather(skyNet.rtc_timestamp);
-    // Serial.print("Skynet current weather: ");
-    // Serial.println(Weather::to_string(skyNet.current_weather));
+    showProgramTimeOfDay(skyNet);
 
     switch (skyNet.current_weather)
     {
     case Weather::WeatherType::Rain:
-        /**
-     * @brief This case dont need a BREAK, because it is possible to have lightings douring rain
-     */
 #ifdef IM_SLAVE
-        StartRain();
-
+        if (!IS_RAINING)
+        {
+            StartRain();
+        }
 #endif IM_SLAVE
         break;
     case Weather::WeatherType::Stormy:
-        StartRain();
+#ifdef IM_SLAVE
+        if (!IS_RAINING)
+        {
+            StartRain();
+        }
+#endif IM_SLAVE
         lighting_counter++;
         if ((lighting_counter % lightning_modulo_base) == 0)
         {
