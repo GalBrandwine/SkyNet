@@ -2,8 +2,10 @@
 #define DATA_PIN 27
 #define LED_TYPE WS2812
 #define COLOR_ORDER GRB
-#define NUM_LEDS_IN_GROUP 3
+
+#define NUM_LEDS_IN_GROUP 6
 #define NUM_OF_GROUPS 3
+
 #define BRIGHTNESS 96
 #define MIN_BRIGHTNESS 50
 #define MAX_BRIGHTNESS 255
