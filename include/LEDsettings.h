@@ -20,7 +20,8 @@
 #define SUMMER_START 5
 #define SUMMER_END 9
 
-#define IM_SLAVE "Compiling SkyNet for slave version"
+#define IM_MASTER "Compiling SkyNet for master version"
+// #define IM_SLAVE "Compiling SkyNet for slave version"
 
 static const uint8_t RAIN_PIN = 15;
 static bool IS_RAINING = false;

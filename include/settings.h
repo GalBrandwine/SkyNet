@@ -24,6 +24,7 @@ struct SkyNetStruct
      * 
      */
     Preferences preferences;
+    bool is_server_ready = false;
     AsyncWebServer *server;
     Weather::WeatherType current_weather{Weather::WeatherType::Automatic};
     float current_temperature = 0;

@@ -6,33 +6,63 @@
 
 bool setUpServer(SkyNetStruct *skyNetStruct)
 {
+    Serial.print("Initiating: ");
+    Serial.println(__PRETTY_FUNCTION__);
     // Route for root / web page
-    skyNetStruct->server->on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+    skyNetStruct->server->on("/", HTTP_GET, [skyNetStruct](AsyncWebServerRequest *request)
                              {
+                                 if (!skyNetStruct->is_server_ready)
+                                 {
+                                     Serial.println("Server not yet ready, returning");
+                                     request->send_P(503, "text/plain", "Service Unavailable /");
+                                     return;
+                                 }
+
                                  request->send(SPIFFS, "/index.html", String(), false);
                                  Serial.println("Got HTTP_GET on '/'");
                              });
-
+    Serial.println(__LINE__);
     // Route to load style.css file
-    skyNetStruct->server->on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request)
+    skyNetStruct->server->on("/style.css", HTTP_GET, [skyNetStruct](AsyncWebServerRequest *request)
                              {
+                                 if (!skyNetStruct->is_server_ready)
+                                 {
+                                     Serial.println("Server not yet ready, returning");
+                                     request->send_P(503, "text/plain", "Service Unavailable: /style.css");
+                                     return;
+                                 }
+
                                  request->send(SPIFFS, "/style.css", "text/css");
                                  Serial.println("Got HTTP_GET on '/style.css'");
                              });
-
+    Serial.println(__LINE__);
     // Route to load clout_1.jpg image
-    skyNetStruct->server->on("/cloud_1.jpg", HTTP_GET, [](AsyncWebServerRequest *request)
+    skyNetStruct->server->on("/cloud_1.jpg", HTTP_GET, [skyNetStruct](AsyncWebServerRequest *request)
                              {
+                                 if (!skyNetStruct->is_server_ready)
+                                 {
+                                     Serial.println("Server not yet ready, returning");
+                                     request->send_P(503, "text/plain", "Service Unavailable: /cloud_1.jpg");
+                                     return;
+                                 }
                                  request->send(SPIFFS, "/cloud_1.jpg", String());
                                  Serial.println("Got HTTP_GET on '/cloud_1.jpg'");
                              });
-
+    Serial.println(__LINE__);
     // Responce for getting current system time.
     skyNetStruct->server->on("/getCurrentSystemTime", HTTP_GET, [skyNetStruct](AsyncWebServerRequest *request)
                              {
+                                 if (!skyNetStruct->is_server_ready)
+                                 {
+                                     Serial.println("Server not yet ready, returning");
+                                     request->send_P(503, "text/plain", "Service Unavailable: /getCurrentSystemTime");
+                                     return;
+                                 }
+
                                  request->send_P(200, "text/plain", skyNetStruct->time_str.c_str());
                                  Serial.println("Got HTTP_GET on '/getCurrentSystemTime'");
                              });
+    Serial.println(__LINE__);
 
     /**
    * @brief Responce for setting current system time.
@@ -42,6 +72,12 @@ bool setUpServer(SkyNetStruct *skyNetStruct)
    */
     skyNetStruct->server->on("/setCurrentSystemTime", HTTP_GET, [skyNetStruct](AsyncWebServerRequest *request)
                              {
+                                 if (!skyNetStruct->is_server_ready)
+                                 {
+                                     Serial.println("Server not yet ready, returning");
+                                     request->send_P(503, "text/plain", "Service Unavailable: /setCurrentSystemTime");
+                                     return;
+                                 }
                                  // request->send_P(200, "text/plain", skyNetStruct->time_str.c_str());
                                  AsyncWebParameter *p = request->getParam(0);
                                  Serial.println("Got HTTP_GET on '/setCurrentSystemTime'");
@@ -95,6 +131,7 @@ bool setUpServer(SkyNetStruct *skyNetStruct)
                                      request->send_P(200, "text/plain", "OK set year");
                                  }
                              });
+    Serial.println(__LINE__);
 
     /**
    * @brief Set new weather request from users html.
@@ -102,6 +139,13 @@ bool setUpServer(SkyNetStruct *skyNetStruct)
    */
     skyNetStruct->server->on("/setCurrentSystemSystemWeather", HTTP_GET, [skyNetStruct](AsyncWebServerRequest *request)
                              {
+                                 if (!skyNetStruct->is_server_ready)
+                                 {
+                                     Serial.println("Server not yet ready, returning");
+                                     request->send_P(503, "text/plain", "Service Unavailable: /setCurrentSystemSystemWeather");
+                                     return;
+                                 }
+
                                  AsyncWebParameter *p = request->getParam(0);
                                  Serial.println("Got HTTP_GET on '/setCurrentSystemSystemWeather'");
                                  Serial.println(p->name());
@@ -109,17 +153,32 @@ bool setUpServer(SkyNetStruct *skyNetStruct)
                                  skyNetStruct->current_weather = Weather::to_weather(p->value());
                                  request->send_P(200, "text/plain", "OK set Weather");
                              });
+    Serial.println(__LINE__);
 
     // Responce for getting current Weather.
     skyNetStruct->server->on("/getCurrentSystemWeather", HTTP_GET, [skyNetStruct](AsyncWebServerRequest *request)
                              {
+                                 if (!skyNetStruct->is_server_ready)
+                                 {
+                                     Serial.println("Server not yet ready, returning");
+                                     request->send_P(503, "text/plain", "Service Unavailable: /getCurrentSystemWeather");
+                                     return;
+                                 }
                                  request->send_P(200, "text/plain", Weather::to_string(skyNetStruct->current_weather).c_str());
                                  Serial.println("Got HTTP_GET on '/getCurrentSystemWeather'");
                              });
+    Serial.println(__LINE__);
 
     // Responce for setting new leds brightness.
     skyNetStruct->server->on("/setLedsBrightness", HTTP_GET, [skyNetStruct](AsyncWebServerRequest *request)
                              {
+                                 if (!skyNetStruct->is_server_ready)
+                                 {
+                                     Serial.println("Server not yet ready, returning");
+                                     request->send_P(503, "text/plain", "Service Unavailable: /setLedsBrightness");
+                                     return;
+                                 }
+
                                  AsyncWebParameter *p = request->getParam(0);
                                  Serial.println("Got HTTP_GET on '/setLedsBrightness'");
                                  Serial.println(p->name());
@@ -146,10 +205,18 @@ bool setUpServer(SkyNetStruct *skyNetStruct)
 
                                  request->send_P(200, "text/plain", "Brightness updated successfully");
                              });
+    Serial.println(__LINE__);
 
     // Responce for getting current Weather.
     skyNetStruct->server->on("/getLedsBrightness", HTTP_GET, [skyNetStruct](AsyncWebServerRequest *request)
                              {
+                                 if (!skyNetStruct->is_server_ready)
+                                 {
+                                     Serial.println("Server not yet ready, returning");
+                                     request->send_P(503, "text/plain", "Service Unavailable: /getLedsBrightness");
+                                     return;
+                                 }
+
                                  Serial.println("Got HTTP_GET on '/getLedsBrightness'");
                                  if (!skyNetStruct->preferences.begin("SkyNetCloud"))
                                  {
@@ -163,9 +230,11 @@ bool setUpServer(SkyNetStruct *skyNetStruct)
                                  request->send_P(200, "text/plain", String(skyNetStruct->ledsSettings.leds_brightness).c_str());
                                  skyNetStruct->preferences.end();
                              });
+    Serial.println(__LINE__);
 
     // Start server
     skyNetStruct->server->begin();
+    Serial.println(__LINE__);
 
     /**
    * @brief Initialize SPIFFS
@@ -177,6 +246,8 @@ bool setUpServer(SkyNetStruct *skyNetStruct)
         return false;
     }
 
-    Serial.println("Server started");
+    Serial.print("Done initiating: ");
+    Serial.println(__PRETTY_FUNCTION__);
+    skyNetStruct->is_server_ready = true;
     return true;
 }
